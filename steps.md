@@ -86,3 +86,37 @@ If needed, you can customize:
        }
      }
    }
+```
+
+2. **main.tf** - Create this file to configure the Lacework agentless scanning setup:
+
+```
+provider "lacework" {
+  profile = "lw_agentless" # Update profile if needed
+}
+
+provider "google" {
+  alias   = "use1"
+  project = "agentless-lw-scanner" # Project where Lacework resources are hosted
+  region  = "us-east1"
+}
+
+module "lacework_gcp_agentless_scanning_project_single_region" {
+  source  = "lacework/agentless-scanning/gcp"
+  version = "~> 2.0"
+  
+  providers = {
+    google = google.use1
+  }
+
+  project_filter_list = [
+    "monitored-project-1",
+    "monitored-project-2"
+  ]
+
+  global                    = true
+  regional                  = true
+  organization_id           = "your-org-id"
+  lacework_integration_name = "agentless_from_terraform"
+}
+```
